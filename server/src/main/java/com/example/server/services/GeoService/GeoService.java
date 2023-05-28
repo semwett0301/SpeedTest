@@ -1,7 +1,12 @@
 package com.example.server.services.GeoService;
 
-public interface GeoService {
-    String getCountry(String ip);
+import com.maxmind.geoip2.exception.GeoIp2Exception;
 
-    String getCity(String ip);
+import java.io.IOException;
+import java.net.UnknownHostException;
+
+public interface GeoService {
+    String getCountry(String ip) throws IOException, GeoIp2Exception;
+
+    String getCity(String ip) throws IOException, GeoIp2Exception;
 }

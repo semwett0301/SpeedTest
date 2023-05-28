@@ -1,10 +1,14 @@
 package com.example.server.controllers;
 
+import com.example.server.model.dto.ResponseIp;
 import com.example.server.services.GeoService.GeoService;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/network")
@@ -25,8 +29,8 @@ public class NetworksController {
     }
 
     @GetMapping("/ip")
-    public String getUserIP() {
-        return request.getRemoteAddr();
+    public ResponseIp getUserIP() throws IOException, GeoIp2Exception {
+        return new ResponseIp(request.getRemoteAddr(), geoService.getCountry(request.getRemoteAddr()), geoService.getCity(request.getRemoteAddr()));
     }
 
     @GetMapping("/ping")
