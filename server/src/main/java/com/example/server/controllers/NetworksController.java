@@ -1,5 +1,6 @@
 package com.example.server.controllers;
 
+import com.example.server.services.GeoService.GeoService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,11 +10,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/network")
 public class NetworksController {
     private final HttpServletRequest request;
+    private final GeoService geoService;
     private String buffer;
 
     @Autowired
-    public NetworksController(HttpServletRequest request) {
+    public NetworksController(HttpServletRequest request, GeoService geoService) {
         this.request = request;
+        this.geoService = geoService;
 
         this.buffer = "x";
         for (var i = 0; i < 23; i++) {
