@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Objects;
@@ -25,10 +26,10 @@ public class GeoServiceImpl implements GeoService {
     public GeoServiceImpl(ResourceLoader resourceLoader) throws IOException {
         String dbLocation = "geo-lite.mmdb";
 
-        Resource res = resourceLoader.getResource("classpath:" + dbLocation);
-        File f = new File(res.getFile().toURI());
+        Resource resource = resourceLoader.getResource("classpath:" + dbLocation);
+        InputStream inputStream = resource.getInputStream();
 
-        databaseReader = new DatabaseReader.Builder(f).build();
+        databaseReader = new DatabaseReader.Builder(inputStream).build();
         this.resourceLoader = resourceLoader;
     }
 
