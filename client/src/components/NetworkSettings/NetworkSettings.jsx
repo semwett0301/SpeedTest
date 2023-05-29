@@ -28,13 +28,13 @@ const NetworkSettings = () => {
         setTxProgress(undefined)
     }, [])
 
-    const buffer = useMemo(() => {
-        let res = 'x'
-        for (let i = 0; i < 23; i++) {
-            res += res
-        }
-        return res
-    }, [])
+    // const buffer = useMemo(() => {
+    //     let res = 'x'
+    //     for (let i = 0; i < 23; i++) {
+    //         res += res
+    //     }
+    //     return res
+    // }, [])
 
     useEffect(() => {
         const getIpInfo = async () => {
@@ -64,7 +64,7 @@ const NetworkSettings = () => {
             }
         }
 
-        const checkTX = async () => {
+        const checkTX = async (buffer) => {
             const currentTime = Date.now()
 
             await request.network.tx(
@@ -84,15 +84,17 @@ const NetworkSettings = () => {
         const checkRX = async () => {
             const currentTime = Date.now()
 
-            await request.network.rx((progress) => {
+            const buffer = await request.network.rx((progress) => {
                 setResOrProgress(setRxProgress, setRx, progress, currentTime)
-            }, controller)
+            }).then(res => res.data)
 
             const currentPing = ping ?? 0
             const diff = Date.now() - currentTime - currentPing || 1
             console.log(diff);
             setRx(Number(buffer.length * 8 * 2 / diff / 1000).toFixed(2))
             setRxProgress(undefined)
+
+            return buffer
         }
 
         if (isLoading) {
@@ -100,8 +102,8 @@ const NetworkSettings = () => {
             setIsLoading(true)
             getIpInfo().then(() =>
                 getPing().then(() =>
-                    checkTX().then(() =>
-                        checkRX().then(() => setIsLoading(false))
+                    checkRX().then(buffer =>
+                        checkTX(buffer).then(() => setIsLoading(false))
                     )
                 )
             )
@@ -119,8 +121,8 @@ const NetworkSettings = () => {
                         Location
                     </Text>
                     <Text view={'secondary'} size={'l'}>Ping</Text>
-                    <Text view={'secondary'} size={'l'}>Upload speed</Text>
                     <Text view={'secondary'} size={'l'}>Download speed</Text>
+                    <Text view={'secondary'} size={'l'}>Upload speed</Text>
                 </div>
                 <div className={cl.textWrapper}>
                     <Text view={'primary'} size={'l'}>
@@ -132,19 +134,19 @@ const NetworkSettings = () => {
                     <Text view={'primary'} size={'l'}>
                         {ping !== undefined ? `${ping} ms` : '-'}
                     </Text>
-                    {txProgress ? (
-                        <ProgressLine value={txProgress} className={cl.progress}/>
-                    ) : (
-                        <Text view={tx ? (tx > 1 ? 'success' : 'alert') : 'primary'} size={'l'}>
-                            {tx !== undefined ? `${tx} Mbit/s` : '-'}
-                        </Text>
-                    )}
-
                     {rxProgress ? (
                         <ProgressLine value={rxProgress} className={cl.progress}/>
                     ) : (
                         <Text view={rx ? (rx > 1 ? 'success' : 'alert') : 'primary'} size={'l'}>
                             {rx !== undefined ? `${rx} Mbit/s` : '-'}
+                        </Text>
+                    )}
+
+                    {txProgress ? (
+                        <ProgressLine value={txProgress} className={cl.progress}/>
+                    ) : (
+                        <Text view={tx ? (tx > 1 ? 'success' : 'alert') : 'primary'} size={'l'}>
+                            {tx !== undefined ? `${tx} Mbit/s` : '-'}
                         </Text>
                     )}
                 </div>

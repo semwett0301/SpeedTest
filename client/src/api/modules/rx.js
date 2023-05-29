@@ -1,5 +1,5 @@
 export default function (instance) {
-    return (onUploadProgress, controller) => instance.post(
+    return (onUploadProgress) => instance.post(
         '/rx',
         {},
         {
