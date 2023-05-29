@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/network")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000","http://speedtestreactapp.s3-website.eu-central-1.amazonaws.com/"})
 public class NetworksController {
     private final HttpServletRequest request;
     private final GeoService geoService;
