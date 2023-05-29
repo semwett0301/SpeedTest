@@ -12,6 +12,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/network")
+@CrossOrigin("localhost:3000")
 public class NetworksController {
     private final HttpServletRequest request;
     private final GeoService geoService;
