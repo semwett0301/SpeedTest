@@ -49,55 +49,59 @@ const NetworkSettings = () => {
 
             setPing(Math.floor(Date.now() - currentTime))
         }
-        //
-        // const setResOrProgress = (
-        //     setProgress,
-        //     setRes,
-        //     progress,
-        //     previousTime
-        // ) => {
-        //     const currentProgress = Math.floor((progress.loaded / progress.total) * 100)
-        //
-        //     if (currentProgress < 100) {
-        //         if (currentProgress < 99) {
-        //             setProgress(currentProgress)
-        //         }
-        //     }
-        // }
-        //
-        // const checkTX = async () => {
-        //     const currentTime = performance.now()
-        //
-        //     await request.network.getTX(
-        //         buffer,
-        //         (progress) => {
-        //             setResOrProgress(setTxProgress, setTx, progress, currentTime)
-        //         },
-        //         controller
-        //     )
-        //
-        //     const currentPing = ping ?? 0
-        //     const diff = performance.now().valueOf() - currentTime - currentPing || 1
-        //     setTx(Number(((8 * 1000 * 8) / diff).toFixed(2)))
-        //     setTxProgress(undefined)
-        // }
-        //
-        // const checkRX = async () => {
-        //     const currentTime = performance.now()
-        //
-        //     await request.network.getRX((progress) => {
-        //         setResOrProgress(setRxProgress, setRx, progress, currentTime)
-        //     }, controller)
-        //
-        //     const currentPing = ping ?? 0
-        //     const diff = performance.now() - currentTime - currentPing || 1
-        //     setRx(Number(((8 * 1000 * 8) / diff).toFixed(2)))
-        //     setRxProgress(undefined)
-        // }
+
+        const setResOrProgress = (
+            setProgress,
+            setRes,
+            progress
+        ) => {
+            const currentProgress = Math.floor((progress.loaded / progress.total) * 100)
+
+            if (currentProgress < 100) {
+                if (currentProgress < 99) {
+                    setProgress(currentProgress)
+                }
+            }
+        }
+
+        const checkTX = async () => {
+            const currentTime = performance.now()
+
+            await request.network.tx(
+                buffer,
+                (progress) => {
+                    setResOrProgress(setTxProgress, setTx, progress, currentTime)
+                }
+            )
+
+            const currentPing = ping ?? 0
+            const diff = performance.now().valueOf() - currentTime - currentPing || 1
+            setTx(Number(((8 * 1000 * 8) / diff).toFixed(2)))
+            setTxProgress(undefined)
+        }
+
+        const checkRX = async () => {
+            const currentTime = Date.now()
+
+            await request.network.rx((progress) => {
+                setResOrProgress(setRxProgress, setRx, progress, currentTime)
+            }, controller)
+
+            const currentPing = ping ?? 0
+            const diff = Date.now() - currentTime - currentPing || 1
+            setRx(Number(((8 * 1000 * 8) / diff).toFixed(2)))
+            setRxProgress(undefined)
+        }
 
         if (isLoading) {
             resetData()
-            getIpInfo().then(() => getPing().then(() => setIsLoading(false)))
+            getIpInfo().then(() =>
+                getPing().then(() =>
+                    checkTX().then(() =>
+                        checkRX().then(() => setIsLoading(false))
+                    )
+                )
+            )
         }
     }, [isLoading])
 
@@ -129,7 +133,7 @@ const NetworkSettings = () => {
                         <ProgressLine value={txProgress} className={cl.progress}/>
                     ) : (
                         <Text view={tx ? (tx > 1 ? 'success' : 'alert') : 'primary'} size={'l'}>
-                            {tx !== undefined ? `${tx} Мбит/с` : '-'}
+                            {tx !== undefined ? `${tx} Mbit/s` : '-'}
                         </Text>
                     )}
 
@@ -137,33 +141,20 @@ const NetworkSettings = () => {
                         <ProgressLine value={rxProgress} className={cl.progress}/>
                     ) : (
                         <Text view={rx ? (rx > 1 ? 'success' : 'alert') : 'primary'} size={'l'}>
-                            {rx !== undefined ? `${rx} Мбит/с` : '-'}
+                            {rx !== undefined ? `${rx} Mbit/s` : '-'}
                         </Text>
                     )}
                 </div>
             </div>
             <div className={cl.buttonWrapper}>
-                {!isLoading ? (
-                    <Button
-                        iconLeft={IconPlay}
-                        size={'l'}
-                        view={'primary'}
-                        label={'Check'}
-                        onClick={() => setIsLoading(true)}
-                    />
-                ) : (
-                    <Button
-                        iconLeft={IconPause}
-                        size={'l'}
-                        view={'primary'}
-                        label={'Stop'}
-                        onClick={() => {
-                            controller.abort()
-                            setIsLoading(false)
-                            resetData()
-                        }}
-                    />
-                )}
+                <Button
+                    iconLeft={IconPlay}
+                    size={'l'}
+                    view={'primary'}
+                    label={'Check'}
+                    disabled={isLoading}
+                    onClick={() => setIsLoading(true)}
+                />
             </div>
         </div>
     )
