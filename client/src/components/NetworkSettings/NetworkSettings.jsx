@@ -65,7 +65,7 @@ const NetworkSettings = () => {
         }
 
         const checkTX = async () => {
-            const currentTime = performance.now()
+            const currentTime = Date.now()
 
             await request.network.tx(
                 buffer,
@@ -75,8 +75,9 @@ const NetworkSettings = () => {
             )
 
             const currentPing = ping ?? 0
-            const diff = performance.now().valueOf() - currentTime - currentPing || 1
-            setTx(Number(((8 * 1000 * 8) / diff).toFixed(2)))
+            const diff = Date.now() - currentTime - currentPing || 1
+            console.log(diff);
+            setTx(Number(buffer.length * 8 * 2 / diff / 1000).toFixed(2));
             setTxProgress(undefined)
         }
 
@@ -89,12 +90,14 @@ const NetworkSettings = () => {
 
             const currentPing = ping ?? 0
             const diff = Date.now() - currentTime - currentPing || 1
-            setRx(Number(((8 * 1000 * 8) / diff).toFixed(2)))
+            console.log(diff);
+            setRx(Number(buffer.length * 8 * 2 / diff / 1000).toFixed(2))
             setRxProgress(undefined)
         }
 
         if (isLoading) {
             resetData()
+            setIsLoading(true)
             getIpInfo().then(() =>
                 getPing().then(() =>
                     checkTX().then(() =>
