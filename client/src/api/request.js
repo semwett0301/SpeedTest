@@ -1,8 +1,10 @@
 import ip from "./modules/ip";
-import {mainInstance} from "./init/mainInstance";
+import {networkInstance} from "./init/networkInstance";
+import ping from "./modules/ping";
 
 export default {
     network: {
-        ip: ip(mainInstance)
+        ip: ip(networkInstance),
+        ping: ping(networkInstance)
     }
 }

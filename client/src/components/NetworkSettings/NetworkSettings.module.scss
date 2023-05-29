@@ -1,6 +1,11 @@
 .wrapper {
   display: flex;
   flex-direction: column;
+
+  border: 2px solid #3132d2;
+  background-color: #d9eeeb;
+  border-radius: 20px;
+  padding: 30px;
 }
 
 .infoWrapper {

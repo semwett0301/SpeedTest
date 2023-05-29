@@ -42,13 +42,13 @@ const NetworkSettings = () => {
             setIpInfo(res.data)
         }
 
-        // const getPing = async () => {
-        //     const currentTime = performance.now()
-        //
-        //     await request.network.checkPing(controller)
-        //
-        //     setPing(Math.floor(performance.now() - currentTime))
-        // }
+        const getPing = async () => {
+            const currentTime = Date.now()
+
+            await request.network.ping()
+
+            setPing(Math.floor(Date.now() - currentTime))
+        }
         //
         // const setResOrProgress = (
         //     setProgress,
@@ -97,7 +97,7 @@ const NetworkSettings = () => {
 
         if (isLoading) {
             resetData()
-            getIpInfo().then(() => setIsLoading(false))
+            getIpInfo().then(() => getPing().then(() => setIsLoading(false)))
         }
     }, [isLoading])
 
@@ -105,30 +105,30 @@ const NetworkSettings = () => {
         <div className={cl.wrapper}>
             <div className={cl.infoWrapper}>
                 <div className={cl.textWrapper}>
-                    <Text view={'secondary'} size={'s'}>
+                    <Text view={'secondary'} size={'l'}>
                         IP-address
                     </Text>
-                    <Text view={'secondary'} size={'s'}>
+                    <Text view={'secondary'} size={'l'}>
                         Location
                     </Text>
-                    <Text view={'secondary'} size={'s'}>Ping</Text>
-                    <Text view={'secondary'} size={'s'}>Upload speed</Text>
-                    <Text view={'secondary'} size={'s'}>Download speed</Text>
+                    <Text view={'secondary'} size={'l'}>Ping</Text>
+                    <Text view={'secondary'} size={'l'}>Upload speed</Text>
+                    <Text view={'secondary'} size={'l'}>Download speed</Text>
                 </div>
                 <div className={cl.textWrapper}>
-                    <Text view={'primary'} size={'s'}>
+                    <Text view={'primary'} size={'l'}>
                         {ipInfo?.ip || '-'}
                     </Text>
-                    <Text view={'primary'} size={'s'}>
+                    <Text view={'primary'} size={'l'}>
                         {ipInfo?.country ?? '-'}, {ipInfo?.city ?? '-'}
                     </Text>
-                    <Text view={'primary'} size={'s'}>
-                        {ping !== undefined ? `${ping} мс` : '-'}
+                    <Text view={'primary'} size={'l'}>
+                        {ping !== undefined ? `${ping} ms` : '-'}
                     </Text>
                     {txProgress ? (
                         <ProgressLine value={txProgress} className={cl.progress}/>
                     ) : (
-                        <Text view={tx ? (tx > 1 ? 'success' : 'alert') : 'primary'} size={'s'}>
+                        <Text view={tx ? (tx > 1 ? 'success' : 'alert') : 'primary'} size={'l'}>
                             {tx !== undefined ? `${tx} Мбит/с` : '-'}
                         </Text>
                     )}
@@ -136,7 +136,7 @@ const NetworkSettings = () => {
                     {rxProgress ? (
                         <ProgressLine value={rxProgress} className={cl.progress}/>
                     ) : (
-                        <Text view={rx ? (rx > 1 ? 'success' : 'alert') : 'primary'} size={'s'}>
+                        <Text view={rx ? (rx > 1 ? 'success' : 'alert') : 'primary'} size={'l'}>
                             {rx !== undefined ? `${rx} Мбит/с` : '-'}
                         </Text>
                     )}
@@ -146,17 +146,17 @@ const NetworkSettings = () => {
                 {!isLoading ? (
                     <Button
                         iconLeft={IconPlay}
-                        size={'s'}
+                        size={'l'}
                         view={'primary'}
-                        label={'Проверить'}
+                        label={'Check'}
                         onClick={() => setIsLoading(true)}
                     />
                 ) : (
                     <Button
                         iconLeft={IconPause}
-                        size={'s'}
+                        size={'l'}
                         view={'primary'}
-                        label={'Остановить'}
+                        label={'Stop'}
                         onClick={() => {
                             controller.abort()
                             setIsLoading(false)
