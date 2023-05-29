@@ -1,20 +1,15 @@
-import {useEffect} from "react";
-import request from "./api/request";
+import NetworkSettings from "./components/NetworkSettings/NetworkSettings";
+import {presetGpnDefault, Theme} from "@consta/uikit/Theme";
+import './App.scss'
 
 function App() {
-
-  useEffect(() => {
-    const getIp = async () => {
-      console.log(await request.ip())
-    }
-
-    getIp().catch(e => console.log(e))
-  }, [])
-
-  return (
-    <div>
-    </div>
-  );
+    return (
+        <Theme preset={presetGpnDefault}>
+            <div className={'app'}>
+                <NetworkSettings/>
+            </div>
+        </Theme>
+    );
 }
 
 export default App;
